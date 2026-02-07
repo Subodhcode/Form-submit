@@ -1,41 +1,67 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Home_table from './Home_table'
 import { toast, ToastContainer } from 'react-toastify'
 
 export default function Home() {
-  let [user, setUser] = useState([])
-  let [editData,setEditData]=useState(null)
-  let [editIndex,setEditIndex]=useState(-1)
+  let [user, setUser] = useState(localStorage.getItem("USER") ? JSON.parse(localStorage.getItem("USER")) :
+    []
+  )
+  let [editData, setEditData] = useState(null)
+  let [editIndex, setEditIndex] = useState(-1)
 
   let saveUser = (e) => {
+
     e.preventDefault()
 
-    let checkemail=user.find((obj)=>obj.uemail==e.target.uemail.value)
-    let checkphone=user.find((obj)=>obj.uphone==e.target.uphone.value)
-    if(checkemail){
+    if (editData) {
+      let oldData = [...user]
+      oldData[editIndex].uname = e.target.uname.value
+      oldData[editIndex].uemail = e.target.uemail.value
+      oldData[editIndex].uphone = e.target.uphone.value
+      oldData[editIndex].umsg = e.target.umsg.value
+      setUser(oldData);
+      //update
+    }
+    else {
+      let obj = {
+        uname: e.target.uname.value,
+        uemail: e.target.uemail.value,
+        uphone: e.target.uphone.value,
+        umsg: e.target.umsg.value,
+      }
+
+
+      setUser([...user, obj])
+      toast.success("User added successfully")
+    }
+    let checkemail = user.find((obj) => obj.uemail == e.target.uemail.value)
+    let checkphone = user.find((obj) => obj.uphone == e.target.uphone.value)
+    if (checkemail) {
       return toast.error("Email already exit ")
     }
-     if(checkphone){
+    if (checkphone) {
       return toast.error("Phone number already exit ")
     }
-    let obj = {
-      uname: e.target.uname.value,
-      uemail: e.target.uemail.value,
-      uphone: e.target.uphone.value,
-      umsg: e.target.umsg.value,
-    }
-   
 
-    setUser([...user,obj])
-    toast.success("User added successfully")
-     e.target.reset()
+    e.target.reset()
   }
 
   //filter ->result
   //Find -->One Result ->object
+
+  let getMovies = () => {
+    console.log("Movie List")
+  }
+
+  // getMovies()
+
+  useEffect(() => {
+    localStorage.setItem("USERS", JSON.stringify(user))
+  }, [user])
+
   return (
     <div>
-      <ToastContainer/>
+      <ToastContainer />
       <section className="max-w-6xl mx-auto p-6">
         <div className="grid grid-cols-1 md:grid-cols-[30%_auto] gap-8">
 
@@ -68,7 +94,7 @@ export default function Home() {
                 className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" name='umsg'
               ></textarea>
 
-              <button 
+              <button
                 type="submit"
                 className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 cursor-pointer"
               >
@@ -78,7 +104,7 @@ export default function Home() {
           </div>
 
           {/* Right Side – Table */}
-          <Home_table  subodh={user} setUser={setUser} setEditData={setEditData} setEditIndex={setEditIndex} />
+          <Home_table subodh={user} setUser={setUser} setEditData={setEditData} setEditIndex={setEditIndex} />
 
         </div>
       </section>
